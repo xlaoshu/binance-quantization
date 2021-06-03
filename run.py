@@ -50,7 +50,11 @@ class Run_Main():
                     spot_res = msg.sell_limit_msg(self.coinType,runbet.get_spot_quantity(False),grid_sell_price, profit_usdt) # 期货卖出开多
                     if spot_res['orderId'] : runbet.set_spot_step(spot_step - 1) # 挂单成功，仓位 -1 
   
-                future_res = msg.sell_limit_future_msg(self.coinType, future_quantity, grid_sell_price) #期货买入开空
+                future_res = msg.sell_limit_future_msg(self.coinType, future_quantity, grid_sell_price) # 期货买入开空
+                if future_res['code'] == -2014:
+                    print("API错误" , future_res)
+                    return
+                print("future_res=>",future_res)
                 if future_res['orderId']:
                     runbet.modify_price(grid_sell_price)#修改data.json中价格
                     runbet.set_future_step(future_step+1) 
@@ -62,15 +66,15 @@ class Run_Main():
                 time.sleep(2) # 为了不被币安api请求次数限制
 
 
-if __name__ == "__main__":
-     instance = Run_Main()
-     try:
-         instance.loop_run()
-     except Exception as e:
-         error_info = "报警：币种{coin},服务停止".format(coin=instance.coinType)
-         msg.dingding_warn(error_info)
+# if __name__ == "__main__":
+#      instance = Run_Main()
+#      try:
+#          instance.loop_run()
+#      except Exception as e:
+#          error_info = "报警：币种{coin},服务停止".format(coin=instance.coinType)
+#          msg.dingding_warn(error_info)
 
-#调试看报错运行下面，正式运行用上面       
-#if __name__ == "__main__":       
-#    instance = Run_Main()    
-#    instance.loop_run()
+# 调试看报错运行下面，正式运行用上面
+if __name__ == "__main__":
+   instance = Run_Main()
+   instance.loop_run()
